@@ -119,16 +119,16 @@ def extract_passages_grouped(data, grouped_refs):
                 if end > len(chapter_content):
                     continue
                 verse_text = ' '.join(chapter_content[v - 1] for v in range(start, end + 1))
-                merged_label.append(f"{book} {chapter}:{start}-{end}")
+                merged_label.append(f"{book} {chapter}:{start}-{end}\n")
                 merged_verses.append(verse_text)
             else:
                 v = int(verses)
                 if v > len(chapter_content):
                     continue
                 verse_text = chapter_content[v - 1]
-                merged_label.append(f"{book} {chapter}:{v}")
+                merged_label.append(f"{book} {chapter}:{v}\n")
                 merged_verses.append(verse_text)
-        label = ', '.join(merged_label)
+        label = ''.join(merged_label)
         content = ' '.join(merged_verses)
         result.append((label, content))
     return result
@@ -184,18 +184,18 @@ def extract_passages_grouped_eng(data, grouped_refs):
                 if end > len(chapter_content):
                     continue
                 verse_text = ' '.join(chapter_content[v - 1] for v in range(start, end + 1))
-                merged_label.append(f"{book} {chapter}:{start}-{end}")
+                merged_label.append(f"{book} {chapter}:{start}-{end}\n")
                 merged_verses.append(verse_text)
             else:
                 v = int(verses)
                 if v > len(chapter_content):
                     continue
                 verse_text = chapter_content[v - 1]
-                merged_label.append(f"{book} {chapter}:{v}")
+                merged_label.append(f"{book} {chapter}:{v}\n")
                 merged_verses.append(verse_text)
 
         # 최종 병합
-        label = ', '.join(merged_label)
+        label = ''.join(merged_label)
         content = ' '.join(merged_verses)
         result.append([label, content])
 
@@ -240,10 +240,15 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
         text_shape = slide.shapes[2]
         text_frame = text_shape.text_frame
         text_frame.clear()
-        text_frame.text = address
-        text_frame.paragraphs[0].font.color.rgb = RGBColor(31, 51, 55)  # 검정색으로 설정
-        text_frame.paragraphs[0].font.size = Pt(37.3)
-        text_frame.paragraphs[0].font.name = '나눔스퀘어 네오 ExtraBold'
+        for i, line in enumerate(address.split('\n')):
+            if i == 0:
+                p = text_frame.paragraphs[0]
+            else:
+                p = text_frame.add_paragraph()
+            p.text = line
+            p.font.color.rgb = RGBColor(31, 51, 55)
+            p.font.size = Pt(37.3)
+            p.font.name = '나눔스퀘어 네오 ExtraBold'
 
         prs.save(output_path)
 
@@ -254,10 +259,15 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
         text_shape = slide.shapes[6]
         text_frame = text_shape.text_frame
         text_frame.clear()
-        text_frame.text = address
-        text_frame.paragraphs[0].font.size = Pt(28)
-        text_frame.paragraphs[0].font.name = '나눔스퀘어 네오 ExtraBold'
-        text_frame.paragraphs[0].font.color.rgb = RGBColor(143, 167, 159)  # 검정색으로 설정
+        for i, line in enumerate(address.split('\n')):
+            if i == 0:
+                p = text_frame.paragraphs[0]
+            else:
+                p = text_frame.add_paragraph()
+            p.text = line
+            p.font.color.rgb = RGBColor(143, 167, 159)
+            p.font.size = Pt(28)
+            p.font.name = '나눔스퀘어 네오 ExtraBold'
 
 
         # 2번째 텍스트 상자 (인덱스 1)에 본문 텍스트 추가
