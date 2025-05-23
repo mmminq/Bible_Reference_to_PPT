@@ -11,7 +11,7 @@ import sys
 
 """
 exe 생성 빌드
-pyinstaller --noconfirm --onefile --add-data "개역개정-text;개역개정-text" --add-data "ESV-text/ESV_cleaned.txt;ESV-text" --add-data "template.pptx;." gui.py
+pyinstaller --noconfirm --onefile --add-data "개역개정-text;개역개정-text" --add-data "ESV-text/ESV_cleaned.txt;ESV-text" gui.py
 """
 
 # 실행 경로 얻기 (PyInstaller 환경과 일반 환경 모두 지원)
@@ -103,7 +103,7 @@ def parse_multi_refs_line(text):
         if len(parts) < 2:
             continue
         ref_text = parts[1]
-        ref_items = [r.strip() for r in ref_text.split(',')]
+        ref_items = [r.strip() for r in ref_text.split(';')]
         grouped_refs.append(ref_items)
     return grouped_refs
 
@@ -220,7 +220,7 @@ def extract_passages_grouped_eng(data, grouped_refs):
 parsed = parse_scripture_file(resource_path("ESV-text/ESV_cleaned.txt"))
 
 def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_path="output.pptx"):
-    if not os.path.exists(template_path):
+    if not os.path.exists(resource_path(template_path)):
         raise FileNotFoundError(f"파일을 찾을 수 없습니다: {template_path}")
     
     prs = Presentation(template_path)
