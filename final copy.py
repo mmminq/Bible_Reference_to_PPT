@@ -297,12 +297,21 @@ def add_scripture_to_ppt(template_path, verse_texts, output_path="output.pptx"):
             else:
                 p = text_frame.add_paragraph()
             
-            p.text = line
+            # p.text = line
             p.font.color.rgb = RGBColor(31, 51, 55)
             p.font.size = Pt(28)
             p.font.name = '나눔스퀘어 네오 Bold'
             p.left_indent = Inches(0.5)          # 전체 단락 들여쓰기
             p.first_line_indent = Inches(-0.3)   # 첫 줄만 왼쪽으로 내어쓰기
+            # 첫 단어가 숫자이면 위 첨자 처리
+            words = line.split()
+            if words and words[0].isdigit():
+                # 위 첨자용 유니코드 변환
+                superscript_map = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+                sup = words[0].translate(superscript_map)
+                p.text = sup + ' ' + ' '.join(words[1:])
+            else:
+                p.text = line
         # text_frame.text = verse  # 바로 텍스트를 할당하여 빈 문단 없이 설정
         # text_frame.paragraphs[0].font.color.rgb = RGBColor(31, 51, 55)  # 검정색으로 설정
         # text_frame.paragraphs[0].font.size = Pt(28)  # 첫 문단의 폰트 설정

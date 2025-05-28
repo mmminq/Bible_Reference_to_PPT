@@ -23,6 +23,13 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
+def absolute_path(file_path):
+    # 절대경로가 이미 주어졌으면 그대로 반환, 아니면 현재 경로 기준으로 반환
+    if os.path.isabs(file_path):
+        return file_path
+    else:
+        return os.path.abspath(file_path)
+
 
 # ------------------------- 성경 데이터 처리 -------------------------
 
@@ -72,7 +79,8 @@ bible_book_abbreviations = {
 
 # texts = read_files_in_directory('개역개정-text')
 # bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
-texts = read_files_in_directory(resource_path('개역개정-text'))
+# texts = read_files_in_directory(resource_path('개역개정-text'))
+texts = read_files_in_directory(absolute_path('C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/개역개정-text'))
 bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
 
 def split_and_format_verses(bible_dict):
@@ -133,7 +141,7 @@ def extract_passages_grouped(data, grouped_refs):
                 start, end = map(int, verses.split('-'))
                 if end > len(chapter_content):
                     continue
-                verse_text = ' '.join(chapter_content[v - 1] for v in range(start, end + 1))
+                verse_text = '\n'.join(chapter_content[v - 1] for v in range(start, end + 1))
                 merged_label.append(f"{book} {chapter}:{start}-{end}\n")
                 merged_verses.append(verse_text)
             else:
@@ -144,7 +152,7 @@ def extract_passages_grouped(data, grouped_refs):
                 merged_label.append(f"{book} {chapter}:{v}\n")
                 merged_verses.append(verse_text)
         label = ''.join(merged_label)
-        content = ' '.join(merged_verses)
+        content = '\n'.join(merged_verses)
         result.append((label, content))
     return result
 
@@ -198,7 +206,7 @@ def extract_passages_grouped_eng(data, grouped_refs):
                 start, end = map(int, verses.split('-'))
                 if end > len(chapter_content):
                     continue
-                verse_text = ' '.join(chapter_content[v - 1] for v in range(start, end + 1))
+                verse_text = '\n'.join(chapter_content[v - 1] for v in range(start, end + 1))
                 merged_label.append(f"{book} {chapter}:{start}-{end}\n")
                 merged_verses.append(verse_text)
             else:
@@ -211,13 +219,13 @@ def extract_passages_grouped_eng(data, grouped_refs):
 
         # 최종 병합
         label = ''.join(merged_label)
-        content = ' '.join(merged_verses)
+        content = '\n'.join(merged_verses)
         result.append([label, content])
 
     return result
 
 # parsed = parse_scripture_file(resource_path("KJV-text/KJV_text.txt"))
-parsed = parse_scripture_file(resource_path("ESV-text/ESV_cleaned.txt"))
+parsed = parse_scripture_file(resource_path("C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/ESV-text/ESV_cleaned.txt"))
 
 def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_path="output.pptx"):
     if not os.path.exists(resource_path(template_path)):
@@ -243,16 +251,27 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
         slide = prs.slides[idx]
 
         # 2번째 텍스트 상자 (인덱스 1)에 본문 텍스트 추가
-        text_shape = slide.shapes[1]
+        text_shape = slide.shapes[7]
         text_frame = text_shape.text_frame
         text_frame.clear()
-        text_frame.text = verse  # 바로 텍스트를 할당하여 빈 문단 없이 설정
-        text_frame.paragraphs[0].font.color.rgb = RGBColor(31, 51, 55)  # 검정색으로 설정
-        text_frame.paragraphs[0].font.size = Pt(28)  # 첫 문단의 폰트 설정
-        text_frame.paragraphs[0].font.name = '나눔스퀘어 네오 Bold'
+        for i, line in enumerate(verse.split('\n')):
+            if i == 0:
+                p = text_frame.paragraphs[0]
+            else:
+                p = text_frame.add_paragraph()
+            superscript_map = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+            sup = str(line.split(' ')[0]).translate(superscript_map)
+            p.text = sup+' '+' '.join(line.split(' ')[1:])
+            p.font.color.rgb = RGBColor(31, 51, 55)
+            p.font.size = Pt(28)
+            p.font.name = '나눔스퀘어 네오 Bold'
+        # text_frame.text = verse  # 바로 텍스트를 할당하여 빈 문단 없이 설정
+        # text_frame.paragraphs[0].font.color.rgb = RGBColor(31, 51, 55)  # 검정색으로 설정
+        # text_frame.paragraphs[0].font.size = Pt(28)  # 첫 문단의 폰트 설정
+        # text_frame.paragraphs[0].font.name = '나눔스퀘어 네오 Bold'
 
         # 3번째 텍스트 상자 (인덱스 2)에 주소 텍스트 추가
-        text_shape = slide.shapes[2]
+        text_shape = slide.shapes[1]
         text_frame = text_shape.text_frame
         text_frame.clear()
         for i, line in enumerate(address.split('\n')):
@@ -271,7 +290,7 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
         slide = prs.slides[idx]
 
         # 2번째 텍스트 상자 (인덱스 1)에 본문 텍스트 추가
-        text_shape = slide.shapes[6]
+        text_shape = slide.shapes[5]
         text_frame = text_shape.text_frame
         text_frame.clear()
         for i, line in enumerate(address.split('\n')):
@@ -286,13 +305,25 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
 
 
         # 2번째 텍스트 상자 (인덱스 1)에 본문 텍스트 추가
-        text_shape = slide.shapes[7]
+        text_shape = slide.shapes[6]
         text_frame = text_shape.text_frame
         text_frame.clear()
-        text_frame.text = verse
+        # text_frame.text = verse
+        for i, line in enumerate(verse.split('\n')):
+            if i == 0:
+                p = text_frame.paragraphs[0]
+            else:
+                p = text_frame.add_paragraph()
+            superscript_map = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+            sup = str(line.split(' ')[0]).translate(superscript_map)
+            p.text = sup+' '+' '.join(line.split(' ')[1:])
+            p.font.color.rgb = RGBColor(79, 101, 94)
+            p.font.size = Pt(20)
+            p.font.name = 'Pretendard Variable'
         text_frame.paragraphs[0].font.size = Pt(20)
         text_frame.paragraphs[0].font.name = 'Pretendard Variable'
         text_frame.paragraphs[0].font.color.rgb = RGBColor(79, 101, 94)  # 검정색으로 설정
+        
 
         prs.save(output_path)
 
@@ -307,7 +338,7 @@ def on_generate_click():
     save_path = filedialog.asksaveasfilename(defaultextension=".pptx", filetypes=[("PowerPoint files", "*.pptx")])
     # PPTX 파일 저장 후 자동 실행
     if save_path:
-        add_scripture_to_ppt(template_path='template.pptx', verse_texts=extracted, verse_texts_eng=extracted_eng, output_path=save_path)
+        add_scripture_to_ppt(template_path='C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/template.pptx', verse_texts=extracted, verse_texts_eng=extracted_eng, output_path=save_path)
         os.startfile(save_path)
         # messagebox.showinfo("완료", f"PPTX 파일이 저장되었습니다: {save_path}")
 
