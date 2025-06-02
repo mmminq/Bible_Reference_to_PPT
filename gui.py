@@ -80,7 +80,7 @@ bible_book_abbreviations = {
 # texts = read_files_in_directory('개역개정-text')
 # bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
 # texts = read_files_in_directory(resource_path('개역개정-text'))
-texts = read_files_in_directory(absolute_path('C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/개역개정-text'))
+texts = read_files_in_directory(absolute_path('C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/개역개정-text'))
 bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
 
 def split_and_format_verses(bible_dict):
@@ -225,7 +225,7 @@ def extract_passages_grouped_eng(data, grouped_refs):
     return result
 
 # parsed = parse_scripture_file(resource_path("KJV-text/KJV_text.txt"))
-parsed = parse_scripture_file(resource_path("C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/ESV-text/ESV_cleaned.txt"))
+parsed = parse_scripture_file(resource_path("C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/ESV-text/ESV_cleaned.txt"))
 
 def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_path="output.pptx"):
     if not os.path.exists(resource_path(template_path)):
@@ -249,9 +249,27 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
 
     for idx, (address, verse) in enumerate(verse_texts):
         slide = prs.slides[idx]
+        
+        # 3번째 텍스트 상자 (인덱스 2)에 주소 텍스트 추가
+        text_shape = slide.shapes[1]
+        text_frame = text_shape.text_frame
+        text_frame.clear()
+        for i, line in enumerate(address.split('\n')):
+            words = line.split()
+            if not words:
+                continue
+            for j, word in enumerate(words):
+                if i == 0 and j == 0:
+                    p = text_frame.paragraphs[0]
+                else:
+                    p = text_frame.add_paragraph()
+                p.text = word
+                p.font.color.rgb = RGBColor(31, 51, 55)
+                p.font.size = Pt(37.3)
+                p.font.name = '나눔스퀘어 네오 ExtraBold'
 
         # 2번째 텍스트 상자 (인덱스 1)에 본문 텍스트 추가
-        text_shape = slide.shapes[7]
+        text_shape = slide.shapes[6]
         text_frame = text_shape.text_frame
         text_frame.clear()
         for i, line in enumerate(verse.split('\n')):
@@ -265,24 +283,6 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
             p.font.color.rgb = RGBColor(31, 51, 55)
             p.font.size = Pt(28)
             p.font.name = '나눔스퀘어 네오 Bold'
-        # text_frame.text = verse  # 바로 텍스트를 할당하여 빈 문단 없이 설정
-        # text_frame.paragraphs[0].font.color.rgb = RGBColor(31, 51, 55)  # 검정색으로 설정
-        # text_frame.paragraphs[0].font.size = Pt(28)  # 첫 문단의 폰트 설정
-        # text_frame.paragraphs[0].font.name = '나눔스퀘어 네오 Bold'
-
-        # 3번째 텍스트 상자 (인덱스 2)에 주소 텍스트 추가
-        text_shape = slide.shapes[1]
-        text_frame = text_shape.text_frame
-        text_frame.clear()
-        for i, line in enumerate(address.split('\n')):
-            if i == 0:
-                p = text_frame.paragraphs[0]
-            else:
-                p = text_frame.add_paragraph()
-            p.text = line
-            p.font.color.rgb = RGBColor(31, 51, 55)
-            p.font.size = Pt(37.3)
-            p.font.name = '나눔스퀘어 네오 ExtraBold'
 
         prs.save(output_path)
 
@@ -305,7 +305,7 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
 
 
         # 2번째 텍스트 상자 (인덱스 1)에 본문 텍스트 추가
-        text_shape = slide.shapes[6]
+        text_shape = slide.shapes[7]
         text_frame = text_shape.text_frame
         text_frame.clear()
         # text_frame.text = verse
@@ -335,10 +335,11 @@ def on_generate_click():
     if not extracted:
         messagebox.showerror("오류", "유효한 구절을 입력하세요.")
         return
-    save_path = filedialog.asksaveasfilename(defaultextension=".pptx", filetypes=[("PowerPoint files", "*.pptx")])
+    # save_path = filedialog.asksaveasfilename(defaultextension=".pptx", filetypes=[("PowerPoint files", "*.pptx")])
+    save_path = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/output.pptx'
     # PPTX 파일 저장 후 자동 실행
     if save_path:
-        add_scripture_to_ppt(template_path='C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/template.pptx', verse_texts=extracted, verse_texts_eng=extracted_eng, output_path=save_path)
+        add_scripture_to_ppt(template_path='C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/template.pptx', verse_texts=extracted, verse_texts_eng=extracted_eng, output_path=save_path)
         os.startfile(save_path)
         # messagebox.showinfo("완료", f"PPTX 파일이 저장되었습니다: {save_path}")
 
