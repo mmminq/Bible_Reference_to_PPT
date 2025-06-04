@@ -7,4 +7,4 @@ ESV_preprocessing.ipynb: ESV_text.txt 파일이 정해진 양식에 맞지 않�
 gui.py: .exe로 빌드하기 전 파이썬 코드 파일입니다.<br><br>
 
 How to use<br>
-추후 업데이트 예정
+실행에 필수적인 파일: '개역개정-text', 'ESV-text', 'main.py', 'pptx_generator.py'
