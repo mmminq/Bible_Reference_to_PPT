@@ -15,13 +15,13 @@ pyinstaller --noconfirm --onefile --add-data "개역개정-text;개역개정-tex
 """
 
 # 개역개정 절대경로
-KOR_BIBLE_PATH = 'C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/개역개정-text'
+KOR_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/개역개정-text'
 # ESV 절대경로
-ESV_BIBLE_PATH = 'C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/ESV-text/ESV_cleaned.txt'
+ESV_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/ESV-text/ESV_cleaned.txt'
 # PPTX 템플릿 절대경로
-TEMPLATE_PATH = 'C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/template.pptx'
+TEMPLATE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/template.pptx'
 # PPTX 출력 절대경로
-OUTPUT_PATH = 'C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/output.pptx'
+OUTPUT_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/output.pptx'
 
 # 실행 경로 얻기 (PyInstaller 환경과 일반 환경 모두 지원)
 def resource_path(relative_path):
@@ -405,4 +405,8 @@ tk.Label(root, text=(
 input_text = tk.Text(root, height=15, width=60)
 input_text.pack(padx=10)
 tk.Button(root, text="PPTX로 변환", command=on_generate_click).pack(pady=10)
-root.mainloop()
+# root.mainloop()
+
+def main():
+    global root
+    root.mainloop()

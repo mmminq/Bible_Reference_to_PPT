@@ -136,7 +136,7 @@ def extract_passages_grouped(data, grouped_refs):
                 merged_verses.append(ref[5:])
                 continue
         for ref in ref_group:
-            match = re.match(r'([가-힣]+)\s+(\d+):([\d\-]+)', ref)
+            match = re.match(r'([가-힣]+)\s*(\d+):([\d,\-\s]+)', ref)
             if not match:
                 continue
             abbr, chapter, verses = match.groups()
@@ -153,6 +153,19 @@ def extract_passages_grouped(data, grouped_refs):
                 verse_text = '\n'.join(chapter_content[v - 1] for v in range(start, end + 1))
                 merged_label.append(f"{book} {chapter}:{start}-{end}\n")
                 merged_verses.append(verse_text)
+            elif '–' in verses:
+                start, end = map(int, verses.split('–'))
+                if end > len(chapter_content):
+                    continue
+                verse_text = '\n'.join(chapter_content[v - 1] for v in range(start, end + 1))
+                merged_label.append(f"{book} {chapter}:{start}-{end}\n")
+                merged_verses.append(verse_text)
+            elif ',' in verses:
+                verse_numbers = [int(v.strip()) for v in verses.split(',')]
+                verse_text = '\n'.join(chapter_content[v - 1] for v in verse_numbers if v <= len(chapter_content))
+                merged_label.append(f"{book} {chapter}:{','.join(map(str, verse_numbers))}\n")
+                merged_verses.append(verse_text)
+                
             else:
                 v = int(verses)
                 if v > len(chapter_content):
@@ -197,7 +210,8 @@ def extract_passages_grouped_eng(data, grouped_refs):
         merged_label = []
 
         for ref in ref_group:
-            match = re.match(r'([가-힣]+)\s+(\d+):([\d\-]+)', ref)
+            # match = re.match(r'([가-힣]+)\s+(\d+):([\d\-]+)', ref)
+            match = re.match(r'([가-힣]+)\s*(\d+):([\d,\-\s]+)', ref)
             if not match:
                 continue
             abbr, chapter, verses = match.groups()
@@ -218,6 +232,19 @@ def extract_passages_grouped_eng(data, grouped_refs):
                 verse_text = '\n'.join(chapter_content[v - 1] for v in range(start, end + 1))
                 merged_label.append(f"{book} {chapter}:{start}-{end}\n")
                 merged_verses.append(verse_text)
+            elif '–' in verses:
+                start, end = map(int, verses.split('–'))
+                if end > len(chapter_content):
+                    continue
+                verse_text = '\n'.join(chapter_content[v - 1] for v in range(start, end + 1))
+                merged_label.append(f"{book} {chapter}:{start}-{end}\n")
+                merged_verses.append(verse_text)
+            elif ',' in verses:
+                verse_numbers = [int(v.strip()) for v in verses.split(',')]
+                verse_text = '\n'.join(chapter_content[v - 1] for v in verse_numbers if v <= len(chapter_content))
+                merged_label.append(f"{book} {chapter}:{','.join(map(str, verse_numbers))}\n")
+                merged_verses.append(verse_text)
+                
             else:
                 v = int(verses)
                 if v > len(chapter_content):
@@ -360,7 +387,6 @@ def on_generate_click():
     if save_path:
         add_scripture_to_ppt(template_path=TEMPLATE_PATH, verse_texts=extracted, verse_texts_eng=extracted_eng, output_path=save_path)
         os.startfile(save_path)
-        # messagebox.showinfo("완료", f"PPTX 파일이 저장되었습니다: {save_path}")
 
 # ------------------------- 실행 -------------------------
 
