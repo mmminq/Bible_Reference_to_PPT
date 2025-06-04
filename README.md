@@ -11,7 +11,7 @@ main.py: 프로그램을 실행하기 위한 코드입니다.
 
 pptx_generator.py: 프로그램 구동에 필수적인 함수를 포함한 코드입니다.
 
-template.pptx: 구절 입력을 위한 pptx 템플릿입니다. 템플릿 수정 시 코드 수정이 필요합니다.
+template.pptx: 구절 입력을 위한 pptx 템플릿입니다. 템플릿 수정 시 코드도 수정이 필요합니다.
 
 
 How to use<br>
