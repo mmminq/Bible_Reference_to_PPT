@@ -14,6 +14,15 @@ exe 생성 빌드
 pyinstaller --noconfirm --onefile --add-data "개역개정-text;개역개정-text" --add-data "ESV-text/ESV_cleaned.txt;ESV-text" gui.py
 """
 
+# 개역개정 절대경로
+KOR_BIBLE_PATH = 'C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/개역개정-text'
+# ESV 절대경로
+ESV_BIBLE_PATH = 'C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/ESV-text/ESV_cleaned.txt'
+# PPTX 템플릿 절대경로
+TEMPLATE_PATH = 'C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/template.pptx'
+# PPTX 출력 절대경로
+OUTPUT_PATH = 'C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/output.pptx'
+
 # 실행 경로 얻기 (PyInstaller 환경과 일반 환경 모두 지원)
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -77,10 +86,7 @@ bible_book_abbreviations = {
     '창': 'Gen', '출': 'Exo', '레': 'Lev', '민': 'Num', '신': 'Deu', '수': 'Jos', '삿': 'Jdg', '룻': 'Rth', '삼상': '1Sa', '삼하': '2Sa', '왕상': '1Ki', '왕하': '2Ki', '대상': '1Ch', '대하': '2Ch', '스': 'Ezr', '느': 'Neh', '에': 'Est', '욥': 'Job', '시': 'Psa', '잠': 'Pro', '전': 'Ecc', '아': 'Son', '사': 'Isa', '렘': 'Jer', '애': 'Lam', '겔': 'Eze', '단': 'Dan', '호': 'Hos', '욜': 'Joe', '암': 'Amo', '옵': 'Oba', '욘': 'Jon', '미': 'Mic', '나': 'Nah', '합': 'Hab', '습': 'Zep', '학': 'Hag', '슥': 'Zec', '말': 'Mal', '마': 'Mat', '막': 'Mar', '눅': 'Luk', '요': 'Joh', '행': 'Act', '롬': 'Rom', '고전': '1Co', '고후': '2Co', '갈': 'Gal', '엡': 'Eph', '빌': 'Php', '골': 'Col', '살전': '1Th', '살후': '2Th', '딤전': '1Ti', '딤후': '2Ti', '딛': 'Tit', '몬': 'Phm', '히': 'Heb', '약': 'Jam', '벧전': '1Pe', '벧후': '2Pe', '요일': '1Jo', '요이': '2Jo', '요삼': '3Jo', '유': 'Jud', '계': 'Rev'
 }
 
-# texts = read_files_in_directory('개역개정-text')
-# bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
-# texts = read_files_in_directory(resource_path('개역개정-text'))
-texts = read_files_in_directory(absolute_path('C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/개역개정-text'))
+texts = read_files_in_directory(absolute_path(KOR_BIBLE_PATH))
 bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
 
 def split_and_format_verses(bible_dict):
@@ -201,7 +207,6 @@ def extract_passages_grouped_eng(data, grouped_refs):
                 continue
 
             chapter_content = chapter_data[chapter_idx] # 예) 창세기 1장 전체를 불러옴
-            print(chapter_content)
 
             if '-' in verses:
                 start, end = map(int, verses.split('-'))
@@ -225,7 +230,7 @@ def extract_passages_grouped_eng(data, grouped_refs):
 
     return result
 
-parsed = parse_scripture_file(resource_path('C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/ESV-text/ESV_cleaned.txt'))
+parsed = parse_scripture_file(resource_path(ESV_BIBLE_PATH))
 
 def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_path="output.pptx"):
     if not os.path.exists(resource_path(template_path)):
@@ -249,9 +254,37 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
 
     for idx, (address, verse) in enumerate(verse_texts):
         slide = prs.slides[idx]
+        
+        # 2번째 텍스트 상자 (인덱스 1)에 개역개정 주소 텍스트 추가
+        text_shape = slide.shapes[1]
+        text_frame = text_shape.text_frame
+        text_frame.clear()
+        for i, line in enumerate(address.split('\n')):
+            if len(address.split('\n')) > 1:
+                if i == 0:
+                    p = text_frame.paragraphs[0]
+                else:
+                    p = text_frame.add_paragraph()
+                p.text = line
+                p.font.color.rgb = RGBColor(31, 51, 55)
+                p.font.size = Pt(37.3)
+                p.font.name = '나눔스퀘어 네오 ExtraBold'
+            else:
+                words = line.split()
+                if not words:
+                    continue
+                for j, word in enumerate(words):
+                    if i == 0 and j == 0:
+                        p = text_frame.paragraphs[0]
+                    else:
+                        p = text_frame.add_paragraph()
+                    p.text = word
+                    p.font.color.rgb = RGBColor(31, 51, 55)
+                    p.font.size = Pt(37.3)
+                    p.font.name = '나눔스퀘어 네오 ExtraBold'
 
-        # 2번째 텍스트 상자 (인덱스 1)에 본문 텍스트 추가
-        text_shape = slide.shapes[7]
+        # 7번째 텍스트 상자 (인덱스 6)에 개역개정 본문 텍스트 추가
+        text_shape = slide.shapes[6]
         text_frame = text_shape.text_frame
         text_frame.clear()
         for i, line in enumerate(verse.split('\n')):
@@ -265,31 +298,13 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
             p.font.color.rgb = RGBColor(31, 51, 55)
             p.font.size = Pt(28)
             p.font.name = '나눔스퀘어 네오 Bold'
-        # text_frame.text = verse  # 바로 텍스트를 할당하여 빈 문단 없이 설정
-        # text_frame.paragraphs[0].font.color.rgb = RGBColor(31, 51, 55)  # 검정색으로 설정
-        # text_frame.paragraphs[0].font.size = Pt(28)  # 첫 문단의 폰트 설정
-        # text_frame.paragraphs[0].font.name = '나눔스퀘어 네오 Bold'
-
-        # 3번째 텍스트 상자 (인덱스 2)에 주소 텍스트 추가
-        text_shape = slide.shapes[1]
-        text_frame = text_shape.text_frame
-        text_frame.clear()
-        for i, line in enumerate(address.split('\n')):
-            if i == 0:
-                p = text_frame.paragraphs[0]
-            else:
-                p = text_frame.add_paragraph()
-            p.text = line
-            p.font.color.rgb = RGBColor(31, 51, 55)
-            p.font.size = Pt(37.3)
-            p.font.name = '나눔스퀘어 네오 ExtraBold'
 
         prs.save(output_path)
 
     for idx, (address, verse) in enumerate(verse_texts_eng):
         slide = prs.slides[idx]
 
-        # 2번째 텍스트 상자 (인덱스 1)에 본문 텍스트 추가
+        # 6번째 텍스트 상자 (인덱스 5)에 ESV 주소 텍스트 추가
         text_shape = slide.shapes[5]
         text_frame = text_shape.text_frame
         text_frame.clear()
@@ -304,8 +319,8 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
             p.font.name = '나눔스퀘어 네오 ExtraBold'
 
 
-        # 2번째 텍스트 상자 (인덱스 1)에 본문 텍스트 추가
-        text_shape = slide.shapes[6]
+        # 8번째 텍스트 상자 (인덱스 7)에 ESV 본문 텍스트 추가
+        text_shape = slide.shapes[7]
         text_frame = text_shape.text_frame
         text_frame.clear()
         # text_frame.text = verse
@@ -337,10 +352,10 @@ def on_generate_click():
         messagebox.showerror("오류", "유효한 구절을 입력하세요.")
         return
     # save_path = filedialog.asksaveasfilename(defaultextension=".pptx", filetypes=[("PowerPoint files", "*.pptx")])
-    save_path = "C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/output.pptx"
+    save_path = OUTPUT_PATH
     # PPTX 파일 저장 후 자동 실행
     if save_path:
-        add_scripture_to_ppt(template_path='C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/template.pptx', verse_texts=extracted, verse_texts_eng=extracted_eng, output_path=save_path)
+        add_scripture_to_ppt(template_path=TEMPLATE_PATH, verse_texts=extracted, verse_texts_eng=extracted_eng, output_path=save_path)
         os.startfile(save_path)
         # messagebox.showinfo("완료", f"PPTX 파일이 저장되었습니다: {save_path}")
 
