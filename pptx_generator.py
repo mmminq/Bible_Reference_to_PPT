@@ -319,8 +319,11 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
                 p = text_frame.paragraphs[0]
             else:
                 p = text_frame.add_paragraph()
-            superscript_map = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
-            sup = str(line.split(' ')[0]).translate(superscript_map)
+            superscript_map = str.maketrans("0123456789:", "⁰¹²³⁴⁵⁶⁷⁸⁹˸")
+            if len(address.split('\n')) > 2:
+                sup = str(address.split('\n')[i].split(' ')[1]).translate(superscript_map)
+            else:
+                sup = str(line.split(' ')[0]).translate(superscript_map)
             p.text = sup+' '+' '.join(line.split(' ')[1:])
             p.font.color.rgb = RGBColor(31, 51, 55)
             p.font.size = Pt(28)
