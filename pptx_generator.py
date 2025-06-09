@@ -143,25 +143,26 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
 
 def on_generate_click():
     raw_text = input_text.get("1.0", tk.END)
-    grouped_refs = parse_multi_refs_line(raw_text)
+    if '–' in raw_text:
+        raw_text = raw_text.replace('–', '-')
+    grouped_refs = parse_multi_refs_line(raw_text) # 구절 목록을 리스트화
     
-    texts = read_files_in_directory(absolute_path(KOR_BIBLE_PATH))
-    bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
-    formatted_bible = split_and_format_verses(bible_dict)
+    texts = read_files_in_directory(absolute_path(KOR_BIBLE_PATH)) # 개역개정 성경 파일 읽기
+    bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))} # 성경 책 이름과 내용을 딕셔너리로 매핑
+    formatted_bible = split_and_format_verses(bible_dict) # 책 별로 구분된 딕셔너리로 변환
+    extracted_kor = extract_passages_grouped(formatted_bible, grouped_refs) # 개역개정 구절 추출
     
-    parsed = parse_scripture_file(resource_path(ESV_BIBLE_PATH))
+    parsed = parse_scripture_file(resource_path(ESV_BIBLE_PATH)) # ESV 성경 파일 읽기
+    extracted_eng = extract_passages_grouped_eng(parsed, grouped_refs) # ESV 구절 추출
 
-    extracted = extract_passages_grouped(formatted_bible, grouped_refs)
-    extracted_eng = extract_passages_grouped_eng(parsed, grouped_refs)
-
-    if not extracted:
+    if not extracted_kor:
         messagebox.showerror("오류", "유효한 구절을 입력하세요.")
         return
     # save_path = filedialog.asksaveasfilename(defaultextension=".pptx", filetypes=[("PowerPoint files", "*.pptx")])
     save_path = OUTPUT_PATH
     # PPTX 파일 저장 후 자동 실행
     if save_path:
-        add_scripture_to_ppt(template_path=TEMPLATE_PATH, verse_texts=extracted, verse_texts_eng=extracted_eng, output_path=save_path)
+        add_scripture_to_ppt(template_path=TEMPLATE_PATH, verse_texts=extracted_kor, verse_texts_eng=extracted_eng, output_path=save_path)
         os.startfile(save_path)
         # messagebox.showinfo("완료", f"PPTX 파일이 저장되었습니다: {save_path}")
 
