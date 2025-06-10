@@ -6,16 +6,21 @@ from pptx.dml.color import RGBColor
 import os
 import copy
 
-from verse_loader import resource_path, absolute_path, read_files_in_directory, parse_scripture_file, extract_passages_grouped, extract_passages_grouped_eng, split_and_format_verses, parse_multi_refs_line
+from pptx_generator.verse_loader import resource_path, absolute_path, read_files_in_directory, parse_scripture_file, extract_passages_grouped, extract_passages_grouped_eng, split_and_format_verses, parse_multi_refs_line
 
 # 개역개정 절대경로
-KOR_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/개역개정-text'
-# ESV 절대경로
-ESV_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/ESV-text/ESV_cleaned.txt'
-# PPTX 템플릿 절대경로
-TEMPLATE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/template.pptx'
-# PPTX 출력 절대경로
-OUTPUT_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/output.pptx'
+# KOR_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/개역개정-text'
+# # ESV 절대경로
+# ESV_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/ESV-text/ESV_cleaned.txt'
+# # PPTX 템플릿 절대경로
+# TEMPLATE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/template.pptx'
+# # PPTX 출력 절대경로
+# OUTPUT_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/output.pptx'
+
+KOR_BIBLE_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/개역개정-text"
+ESV_BIBLE_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/ESV-text/ESV_cleaned.txt"
+TEMPLATE_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/pptx_template/template.pptx"
+OUTPUT_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/pptx_template/output.pptx"
 
 bible_books = [
     "창세기", "출애굽기", "레위기", "민수기", "신명기", "여호수아", "사사기", "룻기", "사무엘상", "사무엘하",
