@@ -57,7 +57,7 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
         
         # 2번째 텍스트 상자 (인덱스 1)에 개역개정 주소 텍스트 추가
         text_shape = slide.shapes[1]
-        text_frame = text_shape.text_frame
+        text_frame = text_shape.text_frame # type: ignore
         text_frame.clear()
         for i, line in enumerate(address.split('\n')):
             if len(address.split('\n')) > 1:
@@ -85,7 +85,7 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
 
         # 7번째 텍스트 상자 (인덱스 6)에 개역개정 본문 텍스트 추가
         text_shape = slide.shapes[6]
-        text_frame = text_shape.text_frame
+        text_frame = text_shape.text_frame # type: ignore
         text_frame.clear()
         for i, line in enumerate(verse.split('\n')):
             if i == 0:
@@ -109,7 +109,7 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
 
         # 6번째 텍스트 상자 (인덱스 5)에 ESV 주소 텍스트 추가
         text_shape = slide.shapes[5]
-        text_frame = text_shape.text_frame
+        text_frame = text_shape.text_frame # type: ignore
         text_frame.clear()
         for i, line in enumerate(address.split('\n')):
             if i == 0:
@@ -124,7 +124,7 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
 
         # 8번째 텍스트 상자 (인덱스 7)에 ESV 본문 텍스트 추가
         text_shape = slide.shapes[7]
-        text_frame = text_shape.text_frame
+        text_frame = text_shape.text_frame # type: ignore
         text_frame.clear()
         # text_frame.text = verse
         for i, line in enumerate(verse.split('\n')):
