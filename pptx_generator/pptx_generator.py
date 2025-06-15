@@ -8,14 +8,22 @@ import copy
 
 from pptx_generator.verse_loader import resource_path, absolute_path, read_files_in_directory, parse_scripture_file, extract_passages_grouped, extract_passages_grouped_eng, split_and_format_verses, parse_multi_refs_line
 
+# # 개역개정 절대경로
+# KOR_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/text_DB/개역개정-text'
+# # ESV 절대경로
+# ESV_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/text_DB/ESV-text/ESV_cleaned.txt'
+# # PPTX 템플릿 절대경로
+# TEMPLATE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/pptx_template/template.pptx'
+# # PPTX 출력 절대경로
+# OUTPUT_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/pptx_template/output.pptx'
 # 개역개정 절대경로
-KOR_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/text_DB/개역개정-text'
+KOR_BIBLE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/text_DB/개역개정-text'
 # ESV 절대경로
-ESV_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/text_DB/ESV-text/ESV_cleaned.txt'
+ESV_BIBLE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/text_DB/ESV-text/ESV_cleaned.txt'
 # PPTX 템플릿 절대경로
-TEMPLATE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/pptx_template/template.pptx'
+TEMPLATE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/pptx_template/template.pptx'
 # PPTX 출력 절대경로
-OUTPUT_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/pptx_template/output.pptx'
+OUTPUT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/pptx_template/output.pptx'
 
 # KOR_BIBLE_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/text_DB/개역개정-text"
 # ESV_BIBLE_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/text_DB/ESV-text/ESV_cleaned.txt"
