@@ -1,0 +1,177 @@
+import tkinter as tk
+from tkinter import filedialog, messagebox
+from pptx import Presentation
+from pptx.util import Pt
+from pptx.dml.color import RGBColor
+import os
+import copy
+
+from pptx_generator.verse_loader import resource_path, absolute_path, read_files_in_directory, parse_scripture_file, extract_passages_grouped, extract_passages_grouped_eng, split_and_format_verses, parse_multi_refs_line
+
+# 경로 설정 (상대경로 기준)
+KOR_BIBLE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/text_DB/개역개정-text'
+ESV_BIBLE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/text_DB/ESV-text/ESV_cleaned.txt'
+TEMPLATE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/pptx_template/template.pptx'
+OUTPUT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/pptx_template/output.pptx'
+
+bible_books = [ ... ]  # 동일하게 유지됨
+
+DEFAULT_STYLE = {
+    "kor_title": {"font": "나눔스퀘어 네오 ExtraBold", "size": 37.3, "color": "#1F3337"},
+    "kor_body": {"font": "나눔스퀘어 네오 Bold", "size": 28, "color": "#1F3337"},
+    "eng_title": {"font": "나눔스퀘어 네오 ExtraBold", "size": 28, "color": "#8FA79F"},
+    "eng_body": {"font": "Pretendard Variable", "size": 20, "color": "#4F655E"}
+}
+
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip('#')
+    return RGBColor(int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16))
+
+
+def duplicate_slide_with_blank_layout(prs, slide):
+        new_slide = prs.slides.add_slide(blank_layout)  # 빈 레이아웃 사용
+        for shape in slide.shapes:
+            new_shape = copy.deepcopy(shape.element)
+            new_slide.shapes._spTree.insert_element_before(new_shape, 'p:extLst')
+        return new_slide
+
+def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, style, output_path="output.pptx"):
+    if not os.path.exists(resource_path(template_path)):
+        raise FileNotFoundError(f"파일을 찾을 수 없습니다: {template_path}")
+    
+    prs = Presentation(template_path)
+    
+    # 빈 레이아웃 (일반적으로 '빈 화면'은 레이아웃 인덱스 6번입니다)
+    blank_layout = prs.slide_layouts[6]
+
+    def duplicate_slide_with_blank_layout(prs, slide):
+        new_slide = prs.slides.add_slide(blank_layout)  # 빈 레이아웃 사용
+        for shape in slide.shapes:
+            new_shape = copy.deepcopy(shape.element)
+            new_slide.shapes._spTree.insert_element_before(new_shape, 'p:extLst')
+        return new_slide
+    
+    # 슬라이드 수 부족하면 복제
+    while len(prs.slides) < len(verse_texts):
+        duplicate_slide_with_blank_layout(prs, prs.slides[-1])
+
+    for i, (kor, eng) in enumerate(zip(verse_texts, verse_texts_eng)):
+        slide = prs.slides[i]
+
+        kor_title_shape = slide.shapes[1]
+        kor_content_shape = slide.shapes[6]
+        eng_title_shape = slide.shapes[5]
+        eng_content_shape = slide.shapes[7]
+
+        # Title (Korean)
+        run = kor_title_shape.text_frame.clear().add_paragraph().add_run()
+        run.text = kor['title']
+        run.font.name = style['kor_title']['font']
+        run.font.size = Pt(style['kor_title']['size'])
+        run.font.color.rgb = hex_to_rgb(style['kor_title']['color'])
+
+        # Body (Korean + English)
+        kor_content_shape.text_frame.clear()
+
+        p_kor = kor_content_shape.text_frame.paragraphs[0]
+        run_kor = p_kor.add_run()
+        run_kor.text = kor['body']
+        run_kor.font.name = style['kor_body']['font']
+        run_kor.font.size = Pt(style['kor_body']['size'])
+        run_kor.font.color.rgb = hex_to_rgb(style['kor_body']['color'])
+
+        p_eng = eng_content_shape.text_frame.add_paragraph()
+        run_eng_title = p_eng.add_run()
+        run_eng_title.text = eng['title'] + "\n"
+        run_eng_title.font.name = style['eng_title']['font']
+        run_eng_title.font.size = Pt(style['eng_title']['size'])
+        run_eng_title.font.color.rgb = hex_to_rgb(style['eng_title']['color'])
+
+        p_eng_body = eng_content_shape.text_frame.add_paragraph()
+        run_eng_body = p_eng_body.add_run()
+        run_eng_body.text = eng['body']
+        run_eng_body.font.name = style['eng_body']['font']
+        run_eng_body.font.size = Pt(style['eng_body']['size'])
+        run_eng_body.font.color.rgb = hex_to_rgb(style['eng_body']['color'])
+
+    prs.save(output_path)
+
+def collect_style():
+    return {
+        "kor_title": {
+            "font": kor_title_font.get(),
+            "size": float(kor_title_size.get()),
+            "color": kor_title_color.get()
+        },
+        "kor_body": {
+            "font": kor_body_font.get(),
+            "size": float(kor_body_size.get()),
+            "color": kor_body_color.get()
+        },
+        "eng_title": {
+            "font": eng_title_font.get(),
+            "size": float(eng_title_size.get()),
+            "color": eng_title_color.get()
+        },
+        "eng_body": {
+            "font": eng_body_font.get(),
+            "size": float(eng_body_size.get()),
+            "color": eng_body_color.get()
+        }
+    }
+
+def on_generate_click():
+    raw_text = input_text.get("1.0", tk.END)
+    if '–' in raw_text:
+        raw_text = raw_text.replace('–', '-')
+    grouped_refs = parse_multi_refs_line(raw_text)
+    texts = read_files_in_directory(absolute_path(KOR_BIBLE_PATH))
+    bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
+    formatted_bible = split_and_format_verses(bible_dict)
+    extracted_kor = extract_passages_grouped(formatted_bible, grouped_refs)
+    parsed = parse_scripture_file(resource_path(ESV_BIBLE_PATH))
+    extracted_eng = extract_passages_grouped_eng(parsed, grouped_refs)
+    if not extracted_kor:
+        messagebox.showerror("오류", "유효한 구절을 입력하세요.")
+        return
+    save_path = OUTPUT_PATH
+    if save_path:
+        style = collect_style()
+        add_scripture_to_ppt(template_path=TEMPLATE_PATH, verse_texts=extracted_kor, verse_texts_eng=extracted_eng, style=style, output_path=save_path)
+        os.startfile(save_path)
+
+# ------------------------- 실행 -------------------------
+
+root = tk.Tk()
+root.title("성경 구절 PPTX 변환기")
+tk.Label(root, text="구절을 입력하세요 (예: 고전 13:4-7; 시 23:1-6)").pack(pady=5)
+input_text = tk.Text(root, height=15, width=60)
+input_text.pack(padx=10)
+
+style_frame = tk.LabelFrame(root, text="서식 설정 (폰트, 크기, 색상)")
+style_frame.pack(padx=10, pady=10)
+
+def add_style_row(parent, label, row, default):
+    tk.Label(parent, text=label).grid(row=row, column=0, sticky="w")
+    font = tk.Entry(parent, width=20)
+    font.insert(0, default["font"])
+    font.grid(row=row, column=1)
+    size = tk.Spinbox(parent, from_=6, to=72, increment=0.5, width=5)
+    size.delete(0, "end")
+    size.insert(0, default["size"])
+    size.grid(row=row, column=2)
+    color = tk.Entry(parent, width=10)
+    color.insert(0, default["color"])
+    color.grid(row=row, column=3)
+    return font, size, color
+
+kor_title_font, kor_title_size, kor_title_color = add_style_row(style_frame, "한글 제목", 0, DEFAULT_STYLE["kor_title"])
+kor_body_font, kor_body_size, kor_body_color = add_style_row(style_frame, "한글 본문", 1, DEFAULT_STYLE["kor_body"])
+eng_title_font, eng_title_size, eng_title_color = add_style_row(style_frame, "영어 제목", 2, DEFAULT_STYLE["eng_title"])
+eng_body_font, eng_body_size, eng_body_color = add_style_row(style_frame, "영어 본문", 3, DEFAULT_STYLE["eng_body"])
+
+tk.Button(root, text="PPTX로 변환", command=on_generate_click).pack(pady=10)
+
+def main():
+    global root
+    root.mainloop()
