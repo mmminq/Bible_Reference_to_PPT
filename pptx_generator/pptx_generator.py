@@ -8,14 +8,7 @@ import copy
 
 from pptx_generator.verse_loader import resource_path, absolute_path, read_files_in_directory, parse_scripture_file, extract_passages_grouped, extract_passages_grouped_eng, split_and_format_verses, parse_multi_refs_line
 
-# # 개역개정 절대경로
-# KOR_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/text_DB/개역개정-text'
-# # ESV 절대경로
-# ESV_BIBLE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/text_DB/ESV-text/ESV_cleaned.txt'
-# # PPTX 템플릿 절대경로
-# TEMPLATE_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/pptx_template/template.pptx'
-# # PPTX 출력 절대경로
-# OUTPUT_PATH = 'C:/Users/kmk47/OneDrive/바탕 화면/참고구절_PPT_자동화/Bible_Reference_to_PPT/pptx_template/output.pptx'
+# ------------------------- 경로 설정 -------------------------
 # 개역개정 절대경로
 KOR_BIBLE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/text_DB/개역개정-text'
 # ESV 절대경로
@@ -24,11 +17,6 @@ ESV_BIBLE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '
 TEMPLATE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/pptx_template/template.pptx'
 # PPTX 출력 절대경로
 OUTPUT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/pptx_template/output.pptx'
-
-# KOR_BIBLE_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/text_DB/개역개정-text"
-# ESV_BIBLE_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/text_DB/ESV-text/ESV_cleaned.txt"
-# TEMPLATE_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/pptx_template/template.pptx"
-# OUTPUT_PATH = "C:/Users/kmk47/Documents/Bible_Reference_to_PPT/pptx_template/output.pptx"
 
 bible_books = [
     "창세기", "출애굽기", "레위기", "민수기", "신명기", "여호수아", "사사기", "룻기", "사무엘상", "사무엘하",
@@ -40,6 +28,7 @@ bible_books = [
     "요한일서", "요한이서", "요한삼서", "유다서", "요한계시록"
 ]
 
+# PPTX 파일에 성경 구절 입력
 def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_path="output.pptx"):
     if not os.path.exists(resource_path(template_path)):
         raise FileNotFoundError(f"파일을 찾을 수 없습니다: {template_path}")
@@ -154,6 +143,7 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_pat
 
         prs.save(output_path)
 
+# ------------------------- GUI 설정 -------------------------
 def on_generate_click():
     raw_text = input_text.get("1.0", tk.END)
     if '–' in raw_text:
@@ -171,7 +161,7 @@ def on_generate_click():
     if not extracted_kor:
         messagebox.showerror("오류", "유효한 구절을 입력하세요.")
         return
-    # save_path = filedialog.asksaveasfilename(defaultextension=".pptx", filetypes=[("PowerPoint files", "*.pptx")])
+    # save_path = filedialog.asksaveasfilename(defaultextension=".pptx", filetypes=[("PowerPoint files", "*.pptx")]) # 저장 경로 선택 가능
     save_path = OUTPUT_PATH
     # PPTX 파일 저장 후 자동 실행
     if save_path:

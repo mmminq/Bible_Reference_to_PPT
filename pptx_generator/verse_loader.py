@@ -36,6 +36,7 @@ def absolute_path(file_path):
 
 # ------------------------- 성경 데이터 처리 -------------------------
 
+# 성경 파일 읽어오기
 def read_files_in_directory(directory):
     file_contents = []
     for filename in os.listdir(directory):
@@ -45,6 +46,7 @@ def read_files_in_directory(directory):
                 file_contents.append(content)
     return file_contents
 
+# 성경 구절을 책, 장, 절로 분리하고 정렬
 def split_and_format_verses(bible_dict):
     result = {}
     for book, verses in bible_dict.items():
@@ -61,7 +63,7 @@ def split_and_format_verses(bible_dict):
         result[book] = chapter_list
     return result
 
-
+# 여러 구절을 한 줄로 묶어서 처리 예) '창세기 1:1; 창세기 1:2' -> [['창세기 1:1', '창세기 1:2']]
 def parse_multi_refs_line(text):
     lines = text.strip().split('\n')
     grouped_refs = []
@@ -74,6 +76,8 @@ def parse_multi_refs_line(text):
         grouped_refs.append(ref_items)
     return grouped_refs
 
+# 성경 구절을 그룹화하여 추출
+# 예) [['창세기 1:1', '창세기 1:2'], ['출애굽기 3:1', '출애굽기 3:2']]
 def extract_passages_grouped(data, grouped_refs):
     result = []
     for ref_group in grouped_refs:
@@ -121,6 +125,8 @@ def extract_passages_grouped(data, grouped_refs):
         result.append((label, content))
     return result
 
+# 성경 파일을 파싱하여 책, 장, 절로 정리
+# 예) {'창세기': {1: ['1 태초에 하나님이 천지를 창조하시니라'], 2: ['1 천지가 창조되었을 때에 하나님이 천지를 창조하시니라']}, ...}
 def parse_scripture_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
@@ -145,6 +151,8 @@ def parse_scripture_file(file_path):
 
     return final_result
 
+# 영어 성경 구절을 그룹화하여 추출
+# 예) [['Gen 1:1', 'Gen 1:2'], ['Exo 3:1', 'Exo 3:2']]
 def extract_passages_grouped_eng(data, grouped_refs):
     result = []
 
