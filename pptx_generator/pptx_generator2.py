@@ -67,10 +67,15 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, style, out
                     p = text_frame.paragraphs[0]
                 else:
                     p = text_frame.add_paragraph()
-                p.text = line
-                p.font.color.rgb = hex_to_rgb(style['kor_title']['color'])
-                p.font.size = Pt(style['kor_title']['size'])
-                p.font.name = style['kor_title']['font']
+                run = p.add_run()
+                # p.text = line
+                # p.font.color.rgb = hex_to_rgb(style['kor_title']['color'])
+                # p.font.size = Pt(style['kor_title']['size'])
+                # p.font.name = style['kor_title']['font']
+                run.text = line
+                run.font.color.rgb = hex_to_rgb(style['kor_title']['color'])
+                run.font.size = Pt(style['kor_title']['size'])
+                run.font.name = style['kor_title']['font']
             else:
                 words = line.split()
                 if not words:
@@ -80,10 +85,11 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, style, out
                         p = text_frame.paragraphs[0]
                     else:
                         p = text_frame.add_paragraph()
-                    p.text = word
-                    p.font.color.rgb = hex_to_rgb(style['kor_body']['color'])
-                    p.font.size = Pt(style['kor_body']['size'])
-                    p.font.name = style['kor_body']['font']
+                    run = p.add_run()
+                    run.text = word
+                    run.font.color.rgb = hex_to_rgb(style['kor_title']['color'])
+                    run.font.size = Pt(style['kor_title']['size'])
+                    run.font.name = style['kor_title']['font']
 
         # 7번째 텍스트 상자 (인덱스 6)에 개역개정 본문 텍스트 추가
         text_shape = slide.shapes[6]
@@ -94,15 +100,20 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, style, out
                 p = text_frame.paragraphs[0]
             else:
                 p = text_frame.add_paragraph()
+            run = p.add_run()
             superscript_map = str.maketrans("0123456789:", "⁰¹²³⁴⁵⁶⁷⁸⁹˸")
             if len(address.split('\n')) > 2:
                 sup = str(address.split('\n')[i].split(' ')[1]).translate(superscript_map)
             else:
                 sup = str(line.split(' ')[0]).translate(superscript_map)
-            p.text = sup+' '+' '.join(line.split(' ')[1:])
-            p.font.color.rgb = hex_to_rgb(style['kor_body']['color'])
-            p.font.size = Pt(style['kor_body']['size'])
-            p.font.name = style['kor_body']['font']
+            # p.text = sup+' '+' '.join(line.split(' ')[1:])
+            # p.font.color.rgb = hex_to_rgb(style['kor_body']['color'])
+            # p.font.size = Pt(style['kor_body']['size'])
+            # p.font.name = style['kor_body']['font']
+            run.text = sup+' '+' '.join(line.split(' ')[1:])
+            run.font.color.rgb = hex_to_rgb(style['kor_body']['color'])
+            run.font.size = Pt(style['kor_body']['size'])
+            run.font.name = style['kor_body']['font']
 
         prs.save(output_path)
 
