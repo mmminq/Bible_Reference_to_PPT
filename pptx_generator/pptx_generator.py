@@ -28,22 +28,22 @@ bible_books = [
     "요한일서", "요한이서", "요한삼서", "유다서", "요한계시록"
 ]
 
+
+
+def duplicate_slide_with_blank_layout(prs, slide):
+    blank_layout = prs.slide_layouts[6]
+    new_slide = prs.slides.add_slide(blank_layout)  # 빈 레이아웃 사용
+    for shape in slide.shapes:
+        new_shape = copy.deepcopy(shape.element)
+        new_slide.shapes._spTree.insert_element_before(new_shape, 'p:extLst')
+    return new_slide
+
 # PPTX 파일에 성경 구절 입력
 def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, output_path="output.pptx"):
     if not os.path.exists(resource_path(template_path)):
         raise FileNotFoundError(f"파일을 찾을 수 없습니다: {template_path}")
     
     prs = Presentation(template_path)
-
-    # 빈 레이아웃 (일반적으로 '빈 화면'은 레이아웃 인덱스 6번입니다)
-    blank_layout = prs.slide_layouts[6]
-
-    def duplicate_slide_with_blank_layout(prs, slide):
-        new_slide = prs.slides.add_slide(blank_layout)  # 빈 레이아웃 사용
-        for shape in slide.shapes:
-            new_shape = copy.deepcopy(shape.element)
-            new_slide.shapes._spTree.insert_element_before(new_shape, 'p:extLst')
-        return new_slide
 
     # 슬라이드 수 부족하면 복제
     while len(prs.slides) < len(verse_texts):

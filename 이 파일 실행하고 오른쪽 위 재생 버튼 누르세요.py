@@ -11,7 +11,7 @@ import sys
 
 """
 exe 생성 빌드
-pyinstaller --noconfirm --onefile --add-data "개역개정-text;개역개정-text" --add-data "ESV-text/ESV_cleaned.txt;ESV-text" gui.py
+pyinstaller --noconfirm --onefile --add-data "C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/개역개정-text;개역개정-text" --add-data "C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/ESV-text;ESV-text" --add-data "C:/Users/ypchu/Desktop/참고구절_PPT_자동화_exe/template.pptx;." 이 파일 실행하고 오른쪽 위 재생 버튼 누르세요.py
 """
 
 # 개역개정 절대경로
