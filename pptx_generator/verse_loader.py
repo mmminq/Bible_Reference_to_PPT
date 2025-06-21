@@ -80,15 +80,11 @@ def parse_multi_refs_line(text):
 # 예) [['창세기 1:1', '창세기 1:2'], ['출애굽기 3:1', '출애굽기 3:2']]
 def extract_passages_grouped(data, grouped_refs):
     result = []
+
     for ref_group in grouped_refs:
         merged_verses = []
         merged_label = []
-        
-        for ref in ref_group:
-            if ref[:5] == '<인용구>':
-                merged_label.append(f"{ref[:5]}\n")
-                merged_verses.append(ref[5:])
-                continue
+
         for ref in ref_group:
             match = re.match(r'([가-힣]+)\s*(\d+):([\d,\-\s]+)', ref)
             if not match:
@@ -97,22 +93,24 @@ def extract_passages_grouped(data, grouped_refs):
             book = book_abbr_map.get(abbr, abbr)
             chapter_idx = int(chapter) - 1
             chapter_data = data.get(book, [])
+
             if chapter_idx >= len(chapter_data):
                 continue
+
             chapter_content = chapter_data[chapter_idx]
+
             if '-' in verses:
                 start, end = map(int, verses.split('-'))
                 if end > len(chapter_content):
                     continue
-                verse_text = '\n'.join(chapter_content[v - 1] for v in range(start, end + 1))
+                verse_texts = [chapter_content[v - 1] for v in range(start, end + 1)]
                 merged_label.append(f"{book} {chapter}:{start}-{end}\n")
-                merged_verses.append(verse_text)
+                merged_verses.extend(verse_texts)
             elif ',' in verses:
                 verse_numbers = [int(v.strip()) for v in verses.split(',')]
-                verse_text = '\n'.join(chapter_content[v - 1] for v in verse_numbers if v <= len(chapter_content))
+                verse_texts = [chapter_content[v - 1] for v in verse_numbers if v <= len(chapter_content)]
                 merged_label.append(f"{book} {chapter}:{','.join(map(str, verse_numbers))}\n")
-                merged_verses.append(verse_text)
-                
+                merged_verses.extend(verse_texts)
             else:
                 v = int(verses)
                 if v > len(chapter_content):
@@ -120,10 +118,25 @@ def extract_passages_grouped(data, grouped_refs):
                 verse_text = chapter_content[v - 1]
                 merged_label.append(f"{book} {chapter}:{v}\n")
                 merged_verses.append(verse_text)
+
         label = ''.join(merged_label)
+        # 분할 조건: label에 '-'가 있고, 구절 개수가 3 이상일 때
+        dash_match = re.search(r':(\d+)-(\d+)', label)
+        if dash_match:
+            start, end = map(int, dash_match.groups())
+            count = end - start + 1
+            if count >= 3:
+                for i in range(0, len(merged_verses), 3):
+                    chunk = merged_verses[i:i+3]
+                    content = '\n'.join(chunk)
+                    result.append([label, content])
+                continue
+
         content = '\n'.join(merged_verses)
-        result.append((label, content))
+        result.append([label, content])
+
     return result
+
 
 # 성경 파일을 파싱하여 책, 장, 절로 정리
 # 예) {'창세기': {1: ['1 태초에 하나님이 천지를 창조하시니라'], 2: ['1 천지가 창조되었을 때에 하나님이 천지를 창조하시니라']}, ...}
@@ -161,7 +174,6 @@ def extract_passages_grouped_eng(data, grouped_refs):
         merged_label = []
 
         for ref in ref_group:
-            # match = re.match(r'([가-힣]+)\s+(\d+):([\d\-]+)', ref)
             match = re.match(r'([가-힣]+)\s*(\d+):([\d,\-\s]+)', ref)
             if not match:
                 continue
@@ -171,24 +183,33 @@ def extract_passages_grouped_eng(data, grouped_refs):
             chapter_data = data.get(book, [])
 
             if chapter_idx >= len(chapter_data):
-                print("비상!!!!!!!!!!!")
                 continue
 
             chapter_content = chapter_data[chapter_idx]
 
             if '-' in verses:
                 start, end = map(int, verses.split('-'))
+                count = end - start + 1
                 if end > len(chapter_content):
                     continue
-                verse_text = '\n'.join(chapter_content[v - 1] for v in range(start, end + 1))
-                merged_label.append(f"{book} {chapter}:{start}-{end}\n")
-                merged_verses.append(verse_text)
+                if count >= 3:
+                    for i in range(start, end + 1, 3):
+                        chunk_start = i
+                        chunk_end = min(i + 2, end)
+                        verse_texts = [chapter_content[v - 1] for v in range(chunk_start, chunk_end + 1)]
+                        label = f"{book} {chapter}:{chunk_start}-{chunk_end}\n" if chunk_start != chunk_end else f"{book} {chapter}:{chunk_start}\n"
+                        content = '\n'.join(verse_texts)
+                        result.append([label, content])
+                    break  # 한 ref_group에서 분할이 일어나면 나머지는 무시
+                else:
+                    verse_text = '\n'.join(chapter_content[v - 1] for v in range(start, end + 1))
+                    merged_label.append(f"{book} {chapter}:{start}-{end}\n")
+                    merged_verses.append(verse_text)
             elif ',' in verses:
                 verse_numbers = [int(v.strip()) for v in verses.split(',')]
                 verse_text = '\n'.join(chapter_content[v - 1] for v in verse_numbers if v <= len(chapter_content))
                 merged_label.append(f"{book} {chapter}:{','.join(map(str, verse_numbers))}\n")
                 merged_verses.append(verse_text)
-                
             else:
                 v = int(verses)
                 if v > len(chapter_content):
@@ -196,10 +217,41 @@ def extract_passages_grouped_eng(data, grouped_refs):
                 verse_text = chapter_content[v - 1]
                 merged_label.append(f"{book} {chapter}:{v}\n")
                 merged_verses.append(verse_text)
-
-        # 최종 병합
-        label = ''.join(merged_label)
-        content = '\n'.join(merged_verses)
-        result.append([label, content])
+        else:
+            # 분할이 없었을 때만 병합
+            label = ''.join(merged_label)
+            content = '\n'.join(merged_verses)
+            if label and content:
+                result.append([label, content])
 
     return result
+
+# '-'로 이어진 구절이 3개 이상이면 3개씩 묶어서 별개의 리스트로 나누는 함수
+def split_long_range_refs(grouped_refs, threshold=3):
+    new_grouped_refs = []
+    for ref_group in grouped_refs:
+        split_groups = []
+        for ref in ref_group:
+            match = re.match(r'([가-힣]+)\s*(\d+):([\d,\-\s]+)', ref)
+            if match:
+                abbr, chapter, verses = match.groups()
+                if '-' in verses:
+                    parts = verses.split('-')
+                    if len(parts) == 2:
+                        start, end = map(int, parts)
+                        count = end - start + 1
+                        if count >= threshold:
+                            # 분할된 각 덩어리를 새로운 그룹으로 추가
+                            for i in range(start, end + 1, threshold):
+                                chunk_start = i
+                                chunk_end = min(i + threshold - 1, end)
+                                if chunk_start == chunk_end:
+                                    split_groups.append([f"{abbr} {chapter}:{chunk_start}"])
+                                else:
+                                    split_groups.append([f"{abbr} {chapter}:{chunk_start}-{chunk_end}"])
+                            break  # 한 ref_group에서 분할이 일어나면 나머지는 무시
+        else:
+            # 분할이 없으면 원래 그룹을 그대로 추가
+            split_groups.append(ref_group)
+        new_grouped_refs.extend(split_groups)
+    return new_grouped_refs

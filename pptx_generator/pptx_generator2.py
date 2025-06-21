@@ -158,47 +158,6 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, style, out
 
         prs.save(output_path)
 
-    # for i, (kor, eng) in enumerate(zip(verse_texts, verse_texts_eng)):
-    #     slide = prs.slides[i]
-
-    #     kor_title_shape = slide.shapes[1]
-    #     kor_content_shape = slide.shapes[6]
-    #     eng_title_shape = slide.shapes[5]
-    #     eng_content_shape = slide.shapes[7]
-
-    #     # Title (Korean)
-    #     run = kor_title_shape.text_frame.clear().add_paragraph().add_run()
-    #     run.text = kor['title']
-    #     run.font.name = style['kor_title']['font']
-    #     run.font.size = Pt(style['kor_title']['size'])
-    #     run.font.color.rgb = hex_to_rgb(style['kor_title']['color'])
-
-    #     # Body (Korean + English)
-    #     kor_content_shape.text_frame.clear()
-
-    #     p_kor = kor_content_shape.text_frame.paragraphs[0]
-    #     run_kor = p_kor.add_run()
-    #     run_kor.text = kor['body']
-    #     run_kor.font.name = style['kor_body']['font']
-    #     run_kor.font.size = Pt(style['kor_body']['size'])
-    #     run_kor.font.color.rgb = hex_to_rgb(style['kor_body']['color'])
-
-    #     p_eng = eng_content_shape.text_frame.add_paragraph()
-    #     run_eng_title = p_eng.add_run()
-    #     run_eng_title.text = eng['title'] + "\n"
-    #     run_eng_title.font.name = style['eng_title']['font']
-    #     run_eng_title.font.size = Pt(style['eng_title']['size'])
-    #     run_eng_title.font.color.rgb = hex_to_rgb(style['eng_title']['color'])
-
-    #     p_eng_body = eng_content_shape.text_frame.add_paragraph()
-    #     run_eng_body = p_eng_body.add_run()
-    #     run_eng_body.text = eng['body']
-    #     run_eng_body.font.name = style['eng_body']['font']
-    #     run_eng_body.font.size = Pt(style['eng_body']['size'])
-    #     run_eng_body.font.color.rgb = hex_to_rgb(style['eng_body']['color'])
-
-    # prs.save(output_path)
-
 def collect_style():
     return {
         "kor_title": {
@@ -228,12 +187,14 @@ def on_generate_click():
     if '–' in raw_text:
         raw_text = raw_text.replace('–', '-')
     grouped_refs = parse_multi_refs_line(raw_text)
+    
     texts = read_files_in_directory(absolute_path(KOR_BIBLE_PATH))
     bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
     formatted_bible = split_and_format_verses(bible_dict)
     extracted_kor = extract_passages_grouped(formatted_bible, grouped_refs)
-    parsed = parse_scripture_file(resource_path(ESV_BIBLE_PATH))
-    extracted_eng = extract_passages_grouped_eng(parsed, grouped_refs)
+
+    eng_texts = parse_scripture_file(resource_path(ESV_BIBLE_PATH))
+    extracted_eng = extract_passages_grouped_eng(eng_texts, grouped_refs)
     if not extracted_kor:
         messagebox.showerror("오류", "유효한 구절을 입력하세요.")
         return
