@@ -28,7 +28,7 @@ DEFAULT_STYLE = {
     "kor_title": {"font": "나눔스퀘어 네오 ExtraBold", "size": 37.3, "color": "#1F3337"},
     "kor_body": {"font": "나눔스퀘어 네오 Bold", "size": 28, "color": "#1F3337"},
     "eng_title": {"font": "나눔스퀘어 네오 ExtraBold", "size": 28, "color": "#8FA79F"},
-    "eng_body": {"font": "Pretendard Variable", "size": 20, "color": "#4F655E"}
+    "eng_body": {"font": "나눔스퀘어OTF_ac Bold", "size": 20, "color": "#4F655E"}
 }
 
 def hex_to_rgb(hex_color):
