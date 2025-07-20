@@ -72,8 +72,15 @@ def parse_multi_refs_line(text):
         if len(parts) < 2:
             continue
         ref_text = parts[1]
-        ref_items = [r.strip() for r in ref_text.split(';')]
-        grouped_refs.append(ref_items)
+        # ref_items = [r.strip() for r in ref_text.split(';')]
+        # grouped_refs.append(ref_items)
+        if ';' in line and '-' not in line:
+            ref_items = [r.strip() for r in ref_text.split(';')]
+            grouped_refs.append(ref_items)
+        elif ';' in line and '-' in line:
+            ref_items = [r.strip() for r in ref_text.split(';')]
+            for l in ref_items:
+                grouped_refs.append([l])
     return grouped_refs
 
 # 성경 구절을 그룹화하여 추출

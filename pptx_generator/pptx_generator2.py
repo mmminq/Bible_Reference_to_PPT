@@ -112,7 +112,10 @@ def add_scripture_to_ppt(template_path, verse_texts, verse_texts_eng, style, out
             # p.font.name = style['kor_body']['font']
             run.text = sup+' '+' '.join(line.split(' ')[1:])
             run.font.color.rgb = hex_to_rgb(style['kor_body']['color'])
-            run.font.size = Pt(style['kor_body']['size'])
+            if len(verse) > 170:
+                run.font.size = Pt(style['kor_body']['size'])*0.9
+            else:
+                run.font.size = Pt(style['kor_body']['size'])
             run.font.name = style['kor_body']['font']
 
         prs.save(output_path)
@@ -187,6 +190,7 @@ def on_generate_click():
     if '–' in raw_text:
         raw_text = raw_text.replace('–', '-')
     grouped_refs = parse_multi_refs_line(raw_text)
+    print(grouped_refs)
     
     texts = read_files_in_directory(absolute_path(KOR_BIBLE_PATH))
     bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
@@ -207,7 +211,7 @@ def on_generate_click():
 # ------------------------- 실행 -------------------------
 
 root = tk.Tk()
-root.title("성경 구절 PPTX 변환기")
+root.title("성경 구절 PPT 변환기")
 tk.Label(root, text="구절을 입력하세요 (예: 고전 13:4-7; 시 23:1-6)").pack(pady=5)
 input_text = tk.Text(root, height=15, width=60)
 input_text.pack(padx=10)
@@ -234,7 +238,7 @@ kor_body_font, kor_body_size, kor_body_color = add_style_row(style_frame, "한�
 eng_title_font, eng_title_size, eng_title_color = add_style_row(style_frame, "영어 제목", 2, DEFAULT_STYLE["eng_title"])
 eng_body_font, eng_body_size, eng_body_color = add_style_row(style_frame, "영어 본문", 3, DEFAULT_STYLE["eng_body"])
 
-tk.Button(root, text="PPTX로 변환", command=on_generate_click).pack(pady=10)
+tk.Button(root, text="PPT로 변환", command=on_generate_click).pack(pady=10)
 
 def main():
     global root
