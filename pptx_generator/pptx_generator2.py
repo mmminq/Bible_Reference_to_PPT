@@ -6,7 +6,7 @@ from pptx.dml.color import RGBColor
 import os
 import copy
 
-from pptx_generator.verse_loader import resource_path, absolute_path, read_files_in_directory, parse_scripture_file, extract_passages_grouped, extract_passages_grouped_eng, split_and_format_verses, parse_multi_refs_line
+from pptx_generator.verse_loader2 import resource_path, absolute_path, read_files_in_directory, parse_scripture_file, extract_passages_grouped, extract_passages_grouped_eng, split_and_format_verses, parse_multi_refs_line
 
 # 경로 설정 (상대경로 기준)
 KOR_BIBLE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/text_DB/개역개정-text'
@@ -190,12 +190,12 @@ def on_generate_click():
     if '–' in raw_text:
         raw_text = raw_text.replace('–', '-')
     grouped_refs = parse_multi_refs_line(raw_text)
-    print(grouped_refs)
     
     texts = read_files_in_directory(absolute_path(KOR_BIBLE_PATH))
     bible_dict = {bible_books[i]: texts[i] for i in range(len(bible_books))}
     formatted_bible = split_and_format_verses(bible_dict)
     extracted_kor = extract_passages_grouped(formatted_bible, grouped_refs)
+    print(extracted_kor)
 
     eng_texts = parse_scripture_file(resource_path(ESV_BIBLE_PATH))
     extracted_eng = extract_passages_grouped_eng(eng_texts, grouped_refs)
